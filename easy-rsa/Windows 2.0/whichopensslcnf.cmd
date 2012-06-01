@@ -10,8 +10,6 @@ set cnf=%CNFDIR%\openssl.cnf
 if defined OPENSSL (
 	for /f "tokens=2" %%v in ('"%OPENSSL%" version') do set OPENSSL_VER=%%v
 
-	echo !OPENSSL_VER:~0,5!
-
 	if "!OPENSSL_VER:~0,5!"=="0.9.6" (
 		set cnf=%CNFDIR%\openssl-0.9.6.cnf
 	) else if "!OPENSSL_VER:~0,5!"=="0.9.8" (
