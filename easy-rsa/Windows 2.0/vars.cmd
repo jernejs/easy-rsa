@@ -22,7 +22,7 @@ set PKCS11TOOL=pkcs11-tool
 :: the openssl.cnf file included
 :: with easy-rsa.
 ::set KEY_CONFIG=path
-for /F "usebackq tokens=1" %%d in (`"%EASY_RSA%\whichopensslcnf.cmd"`) do set KEY_CONFIG=%%d
+for /F "usebackq tokens=*" %%d in (`"%EASY_RSA%\whichopensslcnf.cmd"`) do set KEY_CONFIG=%%d
 
 :: Edit this variable to point to
 :: your soon-to-be-created key
