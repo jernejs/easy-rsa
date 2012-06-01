@@ -120,9 +120,8 @@ goto :eof
 :main
 
 :: Set tool defaults
-::[ -n "%OPENSSL%" ] || export OPENSSL="openssl"
-::[ -n "%PKCS11TOOL%" ] || export PKCS11TOOL="pkcs11-tool"
-::[ -n "%GREP%" ] || export GREP="grep"
+if not defined OPENSSL set OPENSSL=openssl
+if not defined PKCS11TOOL set pkcs11-tool
 
 :: Set defaults
 set DO_REQ=1
