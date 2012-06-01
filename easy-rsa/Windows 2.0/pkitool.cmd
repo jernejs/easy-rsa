@@ -121,7 +121,7 @@ goto :eof
 
 :: Set tool defaults
 if not defined OPENSSL set OPENSSL=openssl
-if not defined PKCS11TOOL set pkcs11-tool
+if not defined PKCS11TOOL set PKCS11TOOL=pkcs11-tool
 
 :: Set defaults
 set DO_REQ=1
