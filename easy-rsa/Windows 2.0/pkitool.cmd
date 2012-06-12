@@ -203,37 +203,37 @@ if [%1]==[] (
 		set PKCS11_MODULE_PATH=%2
 		set PKCS11_SLOT=%3
 		set PKCS11_LABEL=%4
-		if "%PKCS11_LABEL%"=="" (
+		if "!PKCS11_LABEL!"=="" (
 			echo Please specify library name, slot and label >&2
 			exit /b 1
 		)
 		 
-		"%PKCS11TOOL%" --module "%PKCS11_MODULE_PATH%" --init-token --slot "%PKCS11_SLOT%" ^
-		   --label "%PKCS11_LABEL%" && ^
-		"%PKCS11TOOL%" --module "%PKCS11_MODULE_PATH%" --init-pin --slot "%PKCS11_SLOT%"
+		"!PKCS11TOOL!" --module "!PKCS11_MODULE_PATH!" --init-token --slot "!PKCS11_SLOT!" ^
+		   --label "!PKCS11_LABEL!" && ^
+		"!PKCS11TOOL!" --module "!PKCS11_MODULE_PATH!" --init-pin --slot "!PKCS11_SLOT!"
 
-		exit /b %ERRORLEVEL%
+		exit /b !ERRORLEVEL!
 	)
 	if "%1"=="--pkcs11-slots" (
 		set PKCS11_MODULE_PATH=%2
-		if "%PKCS11_MODULE_PATH%"=="" (
+		if "!PKCS11_MODULE_PATH!"=="" (
 			echo Please specify library name >&2
 			exit /b 1
 		)
 
-		"%PKCS11TOOL%" --module "%PKCS11_MODULE_PATH%" --list-slots
+		"!PKCS11TOOL!" --module "!PKCS11_MODULE_PATH!" --list-slots
 		
 		exit /b 0
 	)
 	if "%1"=="--pkcs11-objects" (
 		set PKCS11_MODULE_PATH=%2
 		set PKCS11_SLOT=%3
-		if "%PKCS11_SLOT%"=="" (
+		if "!PKCS11_SLOT!"=="" (
 			echo Please specify library name and slot >&2
 			exit /b 1
 		)
 
-		"%PKCS11TOOL%" --module "%PKCS11_MODULE_PATH%" --list-objects --login --slot "%PKCS11_SLOT%"
+		"!PKCS11TOOL!" --module "!PKCS11_MODULE_PATH!" --list-objects --login --slot "!PKCS11_SLOT!"
 		exit /b 0
 	)
 
@@ -253,7 +253,7 @@ if [%1]==[] (
 	:: errors
 	if "%PARAMOK%"=="0" (
 		set P=%1
-		if "%P:~0,2%"=="--" (
+		if "!P:~0,2!"=="--" (
 			echo %PROGNAME%: unknown option: %1 >&2
 			exit /b 1
 		) else (
@@ -268,7 +268,7 @@ if not [%1]==[] goto paramloop
 
 if not "%BATCH%"=="" (
 	(
-		for /f "tokens=2" %%v in ('"%OPENSSL%" version') do set OPENSSL_VER=%%v
+		for /f "tokens=2" %%v in ('"!OPENSSL!" version') do set OPENSSL_VER=%%v
 	) 2>nul
 
 	if "!OPENSSL_VER:~0,3!"=="0.9" if /I "!OPENSSL_VER:~4,1!" LSS 7 (
@@ -283,12 +283,14 @@ if "%DO_P12%"=="1" if "%DO_P11%"=="1" (
 )
 
 if "%DO_P11%"=="1" (
-	findstr "^pkcs11.*=" "%KEY_CONFIG%" >nul
+	findstr "^pkcs11.*=" "!KEY_CONFIG!" >nul
 	if errorlevel 1 (
-		echo Please edit %KEY_CONFIG% and setup PKCS#11 engine >&2
+		echo Please edit !KEY_CONFIG! and setup PKCS#11 engine >&2
 		exit /b 1
 	)
 )
+:: -config sometimes doesn't work
+set OPENSSL_CONF=%KEY_CONFIG%
 
 :: If we are generating pkcs12, only encrypt the final step
 if "%DO_P12%"=="1" (
@@ -297,7 +299,7 @@ if "%DO_P12%"=="1" (
 )
 
 if "%DO_P11%"=="1" (
-	if "%PKCS11_LABEL%"=="" (
+	if "!PKCS11_LABEL!"=="" (
 		echo PKCS#11 arguments incomplete >&2
 		exit /b 1
 	)
@@ -349,25 +351,25 @@ if "%HOW%"=="0" (
 
 :: Show parameters (debugging)
 if "%DEBUG%"=="1" (
-	echo DO_REQ %DO_REQ%
-	echo REQ_EXT %REQ_EXT%
-	echo DO_CA %DO_CA%
-	echo CA_EXT %CA_EXT%
-	echo NODES_REQ %NODES_REQ%
-	echo NODES_P12 %NODES_P12%
-	echo DO_P12 %DO_P12%
-	echo KEY_CN %KEY_CN%
-	echo BATCH %BATCH%
-	echo DO_ROOT %DO_ROOT%
-	echo KEY_EXPIRE %KEY_EXPIRE%
-	echo CA_EXPIRE %CA_EXPIRE%
-	echo KEY_OU %KEY_OU%
-	echo KEY_NAME %KEY_NAME%
-	echo DO_P11 %DO_P11%
-	echo PKCS11_MODULE_PATH %PKCS11_MODULE_PATH%
-	echo PKCS11_SLOT %PKCS11_SLOT%
-	echo PKCS11_ID %PKCS11_ID%
-	echo PKCS11_LABEL %PKCS11_LABEL%
+	echo DO_REQ !DO_REQ!
+	echo REQ_EXT !REQ_EXT!
+	echo DO_CA !DO_CA!
+	echo CA_EXT !CA_EXT!
+	echo NODES_REQ !NODES_REQ!
+	echo NODES_P12 !NODES_P12!
+	echo DO_P12 !DO_P12!
+	echo KEY_CN !KEY_CN!
+	echo BATCH !BATCH!
+	echo DO_ROOT !DO_ROOT!
+	echo KEY_EXPIRE !KEY_EXPIRE!
+	echo CA_EXPIRE !CA_EXPIRE!
+	echo KEY_OU !KEY_OU!
+	echo KEY_NAME !KEY_NAME!
+	echo DO_P11 !DO_P11!
+	echo PKCS11_MODULE_PATH !PKCS11_MODULE_PATH!
+	echo PKCS11_SLOT !PKCS11_SLOT!
+	echo PKCS11_ID !PKCS11_ID!
+	echo PKCS11_LABEL !PKCS11_LABEL!
 )
 
 :: Make sure ./vars was sourced beforehand
@@ -391,7 +393,7 @@ cd /D "%KEY_DIR%"
 findstr /r /c:"easy-rsa version 2\.[0-9]" "%KEY_CONFIG%" > nul
 if errorlevel 1 (
 	echo %PROGNAME%: KEY_CONFIG (set by the vars.cmd script^) is pointing to the wrong
-	echo version of openssl.cnf: %KEY_CONFIG%
+	echo version of openssl.cnf: !KEY_CONFIG!
 	echo The correct version should have a comment that says: easy-rsa version 2.x
 	exit /b 1
 )
@@ -399,8 +401,8 @@ if errorlevel 1 (
 :: Build root CA
 if "%DO_ROOT%"=="1" (
 		
-	"%OPENSSL%" req %BATCH% -days %CA_EXPIRE% %NODES_REQ% -new -newkey rsa:%KEY_SIZE% -sha1 ^
-	   -x509 -keyout "%CA%.key" -out "%CA%.crt" -config "%KEY_CONFIG%"
+	"!OPENSSL!" req !BATCH! -days !CA_EXPIRE! !NODES_REQ! -new -newkey rsa:!KEY_SIZE! -sha1 ^
+	   -x509 -keyout "!CA!.key" -out "!CA!.crt" -config "!KEY_CONFIG!"
 		
 ) else (
 	:: Make sure CA key/cert is available
@@ -409,10 +411,10 @@ if "%DO_ROOT%"=="1" (
 	if "%DO_P12%"=="1" set ISCA=1
 	if "!ISCA!"=="1" (
 		set ISCERT=0
-		if not exist "%CA%.crt" set ISCERT=1
-		if not exist "%CA%.key" set ISCERT=1
+		if not exist "!CA!.crt" set ISCERT=1
+		if not exist "!CA!.key" set ISCERT=1
 		if "!ISCERT!"=="1" (		
-			echo %PROGNAME%: Need a readable %CA%.crt and %CA%.key in %KEY_DIR%
+			echo %PROGNAME%: Need a readable !CA!.crt and !CA!.key in !KEY_DIR!
 			echo Try %PROGNAME% --initca to build a root certificate/key.
 			exit /b 1
 		)
@@ -425,34 +427,37 @@ if "%DO_ROOT%"=="1" (
 		set /p PKCS11_PIN=User pin: 
 
 		echo Generating key pair on PKCS#11 token...
-		"%PKCS11TOOL%" --module "%PKCS11_MODULE_PATH%" --keypairgen ^
+		"!PKCS11TOOL!" --module "!PKCS11_MODULE_PATH!" --keypairgen ^
 		   --login --pin "!PKCS11_PIN!" ^
 		   --key-type rsa:1024 ^
-		   --slot "%PKCS11_SLOT%" --id "%PKCS11_ID%" --label "%PKCS11_LABEL%" || exit /b 1
-		set PKCS11_ARGS=-engine pkcs11 -keyform engine -key %PKCS11_SLOT%:%PKCS11_ID%
+		   --slot "!PKCS11_SLOT!" --id "!PKCS11_ID!" --label "!PKCS11_LABEL!" || exit /b 1
+		set PKCS11_ARGS=-engine pkcs11 -keyform engine -key !PKCS11_SLOT!:!PKCS11_ID!
 	)
 
 	:: Build cert/key
 	if not "%DO_REQ%"=="0" (
-		"%OPENSSL%" req %BATCH% -days "%KEY_EXPIRE%" %NODES_REQ% -new -newkey rsa:%KEY_SIZE% ^
-		   -keyout "%FN%.key" -out "%FN%.csr" %REQ_EXT% -config "%KEY_CONFIG%" !PKCS11_ARGS!
+
+		"!OPENSSL!" req %BATCH% -days "!KEY_EXPIRE!" %NODES_REQ% -new -newkey rsa:!KEY_SIZE! ^
+		   -keyout "!FN!.key" -out "!FN!.csr" !REQ_EXT! -config "!KEY_CONFIG!" !PKCS11_ARGS!
 	)
 	if not errorlevel 1 if not "%DO_CA%"=="0" (
-		"%OPENSSL%" ca %BATCH% -days "%KEY_EXPIRE%" -out "%FN%.crt" ^
-		   -in "%FN%.csr" %CA_EXT% -md sha1 -config "%KEY_CONFIG%"
+
+		"!OPENSSL!" ca %BATCH% -days "!KEY_EXPIRE!" -out "!FN!.crt" ^
+		   -in "!FN!.csr" !CA_EXT! -md sha1 -config "!KEY_CONFIG!"
 	)
 	if not errorlevel 1 if not "%DO_P12%"=="0" (
-		"%OPENSSL%" pkcs12 -export -inkey "%FN%.key" \
-		   -in "%FN%.crt" -certfile "%CA%.crt" -out "%FN%.p12" %NODES_P12%
+
+		"!OPENSSL!" pkcs12 -export -inkey "%FN%.key" \
+		   -in "!FN!.crt" -certfile "!CA!.crt" -out "!FN!.p12" %NODES_P12%
 	)
 
 	:: Load certificate into PKCS#11 token
 	if "%DO_P11%"=="1" (
-		"%OPENSSL%" x509 -in "%FN%.crt" -inform PEM -out "%FN%.crt.der" -outform DER && ^
-		  "%PKCS11TOOL%" --module "%PKCS11_MODULE_PATH%" --write-object "%FN%.crt.der" --type cert ^
+		"!OPENSSL!" x509 -in "!FN!.crt" -inform PEM -out "!FN!.crt.der" -outform DER && ^
+		  "!PKCS11TOOL!" --module "!PKCS11_MODULE_PATH!" --write-object "!FN!.crt.der" --type cert ^
 			--login --pin "!PKCS11_PIN!" \
-			--slot "%PKCS11_SLOT%" --id "%PKCS11_ID%" --label "%PKCS11_LABEL%"
+			--slot "!PKCS11_SLOT!" --id "!PKCS11_ID!" --label "!PKCS11_LABEL!"
 		
-		if exist "%FN%.crt.der" del "%FN%.crt.der"
+		if exist "!FN!.crt.der" del "!FN!.crt.der"
 	)
 )
