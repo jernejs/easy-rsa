@@ -146,63 +146,63 @@ if [%1]==[] (
 )
 :paramloop
 	set PARAMOK=0
-	if "%1"=="--keysize" (
-		set KEY_SIZE=%2
+	if [%1]==[--keysize] (
+		set KEY_SIZE=%~2
 		shift
 		set PARAMOK=1
 	)
-	if "%1"=="--server" (
+	if [%1]==[--server] (
 		set REQ_EXT=%REQ_EXT% -extensions server
 		set CA_EXT=%CA_EXT% -extensions server
 		set PARAMOK=1
 	)
-	if "%1"=="--batch" (
+	if [%1]==[--batch] (
 		set BATCH=-batch
 		set PARAMOK=1
 	)
-	if "%1"=="--interact" (
+	if [%1]==[--interact] (
 		set BATCH=
 		set PARAMOK=1
 	)
-	if "%1"=="--inter" (
+	if [%1]==[--inter] (
 		set CA_EXT=%CA_EXT% -extensions v3_ca
 		set PARAMOK=1
 	)
-	if "%1"=="--initca" (
+	if [%1]==[--initca] (
 		set DO_ROOT=1
 		set PARAMOK=1
 	)
-	if "%1"=="--pass" (
+	if [%1]==[--pass] (
 		set NODES_REQ=
 		set PARAMOK=1
 	)
-	if "%1"=="--csr" (
+	if [%1]==[--csr] (
 		set DO_CA=0
 		set PARAMOK=1
 	)
-	if "%1"=="--sign" (
+	if [%1]==[--sign] (
 		set DO_REQ=0
 		set PARAMOK=1
 	)
-	if "%1"=="--pkcs12" (
+	if [%1]==[--pkcs12] (
 		set DO_P12=1
 		set PARAMOK=1
 	)
-	if "%1"=="--pkcs11" (
+	if [%1]==[--pkcs11] (
 		set DO_P11=1
-		set PKCS11_MODULE_PATH=%2
-		set PKCS11_SLOT=%3
-		set PKCS11_ID=%4
-		set PKCS11_LABEL=%5
+		set PKCS11_MODULE_PATH=%~2
+		set PKCS11_SLOT=%~3
+		set PKCS11_ID=%~4
+		set PKCS11_LABEL=%~5
 		shift /4
 		set PARAMOK=1
 	)
 
 	:: standalone
-	if "%1"=="--pkcs11-init" (
-		set PKCS11_MODULE_PATH=%2
-		set PKCS11_SLOT=%3
-		set PKCS11_LABEL=%4
+	if [%1]==[--pkcs11-init] (
+		set PKCS11_MODULE_PATH=%~2
+		set PKCS11_SLOT=%~3
+		set PKCS11_LABEL=%~4
 		if "!PKCS11_LABEL!"=="" (
 			echo Please specify library name, slot and label >&2
 			exit /b 1
@@ -214,8 +214,8 @@ if [%1]==[] (
 
 		exit /b !ERRORLEVEL!
 	)
-	if "%1"=="--pkcs11-slots" (
-		set PKCS11_MODULE_PATH=%2
+	if [%1]==[--pkcs11-slots] (
+		set PKCS11_MODULE_PATH=%~2
 		if "!PKCS11_MODULE_PATH!"=="" (
 			echo Please specify library name >&2
 			exit /b 1
@@ -225,9 +225,9 @@ if [%1]==[] (
 		
 		exit /b 0
 	)
-	if "%1"=="--pkcs11-objects" (
-		set PKCS11_MODULE_PATH=%2
-		set PKCS11_SLOT=%3
+	if [%1]==[--pkcs11-objects] (
+		set PKCS11_MODULE_PATH=%~2
+		set PKCS11_SLOT=%~3
 		if "!PKCS11_SLOT!"=="" (
 			echo Please specify library name and slot >&2
 			exit /b 1
@@ -237,15 +237,15 @@ if [%1]==[] (
 		exit /b 0
 	)
 
-	if "%1"=="--help" (
+	if [%1]==[--help] (
 		call :usage
 		exit /b
 	)
-	if "%1"=="--usage" (
+	if [%1]==[--usage] (
 		call :usage
 		exit /b
 	)	
-	if "%1"=="--version" (
+	if [%1]==[--version] (
 		echo %PROGNAME% %VERSION%
 		exit /b
 	)
@@ -325,7 +325,7 @@ if "%DO_ROOT%"=="1" (
 if "%HOW%"=="1" (
 	if not defined KEY_CN (
 		if not [%1]==[] (
-			set KEY_CN=%1
+			set KEY_CN=%~1
 		) else if defined KEY_ORG (
 			set KEY_CN=%KEY_ORG% CA
 		)
@@ -337,7 +337,7 @@ if "%HOW%"=="1" (
 if "%HOW%"=="2" (
 	echo Using Common Name: !KEY_CN!
 	set FN=!KEY_CN!
-	if not [%1]==[] set FN=%1
+	if not [%1]==[] set FN=%~1
 )
 if "%HOW%"=="0" (
 	if [%1]==[] (
@@ -345,7 +345,7 @@ if "%HOW%"=="0" (
 		::call :usage
 		exit /b 1
 	)
-	set KEY_CN=%1
+	set KEY_CN=%~1
 	set FN=!KEY_CN!
 )
 
